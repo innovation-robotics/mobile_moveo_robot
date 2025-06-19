@@ -1,0 +1,77 @@
+repositories:
+  AprilTag-ROS-2:
+    type: git
+    url: https://github.com/innovation-robotics/AprilTag-ROS-2.git
+    version: main
+  mobile_moveo_ros2:
+    type: git
+    url: https://github.com/innovation-robotics/mobile_moveo_ros2.git
+    version: main
+  moveit_resources:
+    type: git
+    url: https://github.com/innovation-robotics/moveit_resources.git
+    version: humble
+  moveo_arm_arduino:
+    type: git
+    url: https://github.com/innovation-robotics/moveo_arm_arduino.git
+    version: main
+  realsense-ros:
+    type: git
+    url: https://github.com/innovation-robotics/realsense-ros.git
+    version: ros2
+  rviz_visual_tools:
+    type: git
+    url: https://github.com/innovation-robotics/rviz_visual_tools.git
+    version: ros2
+  stretch_ros2:
+    type: git
+    url: https://github.com/innovation-robotics/stretch_ros2.git
+    version: ros_world2021
+  launch_param_builder:
+    type: git
+    url: https://github.com/innovation-robotics/launch_param_builder.git
+    version: main
+  moveit2:
+    type: git
+    url: https://github.com/innovation-robotics/moveit2.git
+    version: humble
+  moveit_task_constructor:
+    type: git
+    url: https://github.com/innovation-robotics/moveit_task_constructor.git
+    version: humble
+  moveo_diffdrive_arduino:
+    type: git
+    url: https://github.com/innovation-robotics/moveo_diffdrive_arduino.git
+    version: main
+  ros_ign:
+    type: git
+    url: https://github.com/innovation-robotics/ros_ign.git
+    version: feature/add_system_clock
+  srdfdom:
+    type: git
+    url: https://github.com/innovation-robotics/srdfdom.git
+    version: ros2
+  tcp_gstreamer_publisher:
+    type: git
+    url: https://github.com/innovation-robotics/tcp_gstreamer_publisher.git
+    version: main
+  moveit2_tutorials:
+    type: git
+    url: https://github.com/innovation-robotics/moveit2_tutorials.git
+    version: humble
+  moveit_visual_tools:
+    type: git
+    url: https://github.com/innovation-robotics/moveit_visual_tools.git
+    version: ros2
+  moveo_generate_parameter_library:
+    type: git
+    url: https://github.com/innovation-robotics/moveo_generate_parameter_library.git
+    version: main
+  rosparam_shortcuts:
+    type: git
+    url: https://github.com/innovation-robotics/rosparam_shortcuts.git
+    version: ros2
+  stretch_moveit_plugins:
+    type: git
+    url: https://github.com/innovation-robotics/stretch_moveit_plugins.git
+    version: main
