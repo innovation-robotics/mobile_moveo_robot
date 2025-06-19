@@ -39,7 +39,7 @@ cd mobile_moveo
 mkdir src
 cd src
 git clone --branch main https://github.com/innovation-robotics/mobile_moveo_robot.git
-vcs import < moveit2_tutorials/moveit2_tutorials.repos
+vcs import < mobile_moveo_robot/mobile_moveo.repos
 
 git clone --branch main https://github.com/innovation-robotics/AprilTag-ROS-2.git
 git clone --branch main https://github.com/innovation-robotics/mobile_moveo_ros2.git
