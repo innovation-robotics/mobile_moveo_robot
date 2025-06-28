@@ -1,8 +1,4 @@
-# Use the official Ubuntu 22.04 base image
 FROM ubuntu:22.04
-
-# Set a maintainer label (optional but good practice)
-LABEL maintainer="info@innovation-robotics.com"
 
 # Example of installing programs
 RUN apt-get update \
@@ -10,9 +6,6 @@ RUN apt-get update \
     nano \
     vim \
     && rm -rf /var/lib/apt/lists/*
-
-# Example of copying a file
-COPY config/ /site_config/
 
 # Create a non-root user
 ARG USERNAME=ros
@@ -30,13 +23,5 @@ RUN apt-get update \
   && chmod 0440 /etc/sudoers.d/$USERNAME \
   && rm -rf /var/lib/apt/lists/*
 
-  # You can add more instructions here as needed, for example:
-# COPY . /app
-# RUN make
-# EXPOSE 8080
-# CMD ["./your-application"]
 
-# Default command to run when the container starts
-# This will keep the container running indefinitely for inspection
 CMD ["bash"]
-

@@ -29,8 +29,77 @@ docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi
 
 - Create Ubuntu 22.04 with ROS Humble Docker Image
 Steps:
+download this file
+https://github.com/innovation-robotics/mobile_moveo_robot/blob/main/Dockerfile
+then build it
 docker build -t my-ubuntu-2204-image .
-docker run --name=mobile_moveo_container -it --user ros --network=host --ipc=host -v $PWD/mobile_moveo_docker_ws:/home/ros -v /tmp/.X11-unix:/tmp/.X11-unix:rw --env=DISPLAY --gpus all my-ubuntu-2204-image
+cd
+mkdir docker
+cd docker
+mkdir mobile_moveo_docker_ws
+cd mobile_moveo_docker_ws
+docker run --name=mobile_moveo_container -it --privileged --device=/dev/video0:/dev/video0 --device=/dev/video1:/dev/video1 --device=/dev/media0:/dev/media0 --user ros --network=host --ipc=host -v $PWD/mobile_moveo_docker_ws:/home/ros -v /tmp/.X11-unix:/tmp/.X11-unix:rw --env=DISPLAY --gpus all my-ubuntu-2204-image:with-dep-yolo
+docker container start -i mobile_moveo_container
+
+- Installing OpenCV with GStreamer
+apt list --installed | grep opencv
+sudo apt purge libopencv* python3-opencv opencv-data
+sudo apt autoremove
+sudo apt clean
+sudo apt autoclean
+sudo apt-get update
+sudo apt-get install gstreamer1.0*
+sudo apt install ubuntu-restricted-extras
+sudo apt install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+sudo apt-get install -y libopenjpip7 libopenjpip-dec-server libopenjp2-tools
+sudo apt-get install libgstreamer1.0–0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
+sudo apt-get install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libavresample-dev
+sudo apt pkg-config
+sudo apt install libgtk-3-dev
+sudo apt install libgtk2.0-dev
+sudo apt install libdc1394–22-dev
+cd opencv
+mkdir build
+cd build
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+-D INSTALL_PYTHON_EXAMPLES=ON \
+-D INSTALL_C_EXAMPLES=OFF \
+-D PYTHON_EXECUTABLE=$(which python3) \
+-D BUILD_opencv_python2=OFF \
+-D CMAKE_INSTALL_PREFIX=$(python3 -c "import sys; print(sys.prefix)") \
+-D PYTHON3_EXECUTABLE=$(which python3) \
+-D PYTHON3_INCLUDE_DIR=$(python3 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") \
+-D PYTHON3_PACKAGES_PATH=$(python3 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())") \
+-D WITH_GSTREAMER=ON \
+-D BUILD_EXAMPLES=OFF ..
+sudo make -j16
+sudo make install
+sudo ldconfig
+python3
+import cv2
+print(cv2.getBuildInformation())
+
+Installing ROS Humble
+Steps:
+locale  # check for UTF-8
+sudo apt update && sudo apt install locales
+sudo locale-gen en_US en_US.UTF-8
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
+locale  # verify settings
+sudo apt install software-properties-common
+sudo add-apt-repository universe
+sudo apt update && sudo apt install curl -y
+export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F\" '{print $4}')
+curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo $VERSION_CODENAME)_all.deb" # If using Ubuntu derivates use $UBUNTU_CODENAME
+sudo dpkg -i /tmp/ros2-apt-source.deb
+sudo apt update
+sudo apt upgrade
+sudo apt install ros-humble-desktop
+sudo apt install ros-dev-tools
+exit
+
+- Installing Mobile Moveo
 docker container start -i mobile_moveo_container
 cd home
 cd ros
@@ -40,24 +109,52 @@ mkdir src
 cd src
 git clone --branch main https://github.com/innovation-robotics/mobile_moveo_robot.git
 vcs import < mobile_moveo_robot/mobile_moveo.repos
+source /opt/ros/humble/setup.bash
+sudo apt install python3-rosdep
+sudo rosdep init
+rosdep update
+sudo apt update
+sudo apt dist-upgrade
+sudo apt install python3-colcon-common-extensions
+sudo apt install python3-colcon-mixin
+colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
+colcon mixin update default
+sudo apt install python3-vcstool
+sudo apt-get install ros-humble-ros-gz
+sudo apt install ros-humble-ros-gz-bridge
+sudo apt install ros-humble-ros-gz-sim
+sudo apt install ros-humble-gazebo-ros* ros-humble-gazebo-dev ignition-fortress
+colcon build --packages-select v4l2_camera image_transport_plugins --event-handlers desktop_notification- status- --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+source install/setup.bash
+ldd /opt/ros/humble/lib/librviz_default_plugins.so
+sudo mv /opt/ros/humble/lib/x86_64-linux-gnu/libimage_transport.so /opt/ros/humble/lib/x86_64-linux-gnu/libimage_transport.so.old
+cd src
+sudo apt update && rosdep install -r --from-paths . --ignore-src --rosdistro $ROS_DISTRO -y
+cd ..
+export IGNITION_VERSION=fortress
+colcon build --event-handlers desktop_notification- status- --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
 
-git clone --branch main https://github.com/innovation-robotics/AprilTag-ROS-2.git
-git clone --branch main https://github.com/innovation-robotics/mobile_moveo_ros2.git
-git clone --branch humble https://github.com/innovation-robotics/moveit_resources.git
-git clone --branch main https://github.com/innovation-robotics/moveo_arm_arduino.git
-git clone --branch ros2 https://github.com/innovation-robotics/realsense-ros.git
-git clone --branch ros2 https://github.com/innovation-robotics/rviz_visual_tools.git
-git clone --branch ros_world2021 https://github.com/innovation-robotics/stretch_ros2.git
-git clone --branch main https://github.com/innovation-robotics/launch_param_builder.git
-git clone --branch humble https://github.com/innovation-robotics/moveit2.git
-git clone --branch humble https://github.com/innovation-robotics/moveit_task_constructor.git
-git clone --branch main https://github.com/innovation-robotics/moveo_diffdrive_arduino.git
-git clone --branch feature/add_system_clock https://github.com/innovation-robotics/ros_ign.git
-git clone --branch ros2 https://github.com/innovation-robotics/srdfdom.git
-git clone --branch main https://github.com/innovation-robotics/tcp_gstreamer_publisher.git
-git clone --branch main https://github.com/innovation-robotics/mobile_moveo_robot.git
-git clone --branch humble https://github.com/innovation-robotics/moveit2_tutorials.git
-git clone --branch ros2 https://github.com/innovation-robotics/moveit_visual_tools.git
-git clone --branch main https://github.com/innovation-robotics/moveo_generate_parameter_library.git
-git clone --branch ros2 https://github.com/innovation-robotics/rosparam_shortcuts.git
-git clone --branch main https://github.com/innovation-robotics/stretch_moveit_plugins.git
+- Installing Yolo for ROS2
+git clone https://github.com/mgonzs13/yolo_ros.git
+sudo apt update
+sudo apt install python3-pip
+pip3 install -r yolo_ros/requirements.txt
+cd ~/ros2_ws
+rosdep install --from-paths src --ignore-src -r -y
+colcon build
+sudo usermod -a -G video ros
+sudo usermod -a -G sudo ros
+v4l2-ctl --list-devices
+v4l2-ctl --list-formats-ext -d /dev/video0
+gst-launch-1.0 -e -v v4l2src device=/dev/video0 ! image/jpeg,width=1280,height=720,framerate=30/1 ! jpegdec ! videoconvert ! autovideosink
+docker commit -m "Installing yolo and dependencies" mobile_moveo_container my-ubuntu-2204-image:with-dep-yolo
+docker exec -it mobile_moveo_container /bin/bash
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+sudo apt-get install ros-${ROS_DISTRO}-v4l2-camera
+ros2 run v4l2_camera v4l2_camera_node
+ros2 launch yolo_bringup yolo.launch.py
+rviz2
+
+TODO
+- Please remove ros_ign
