@@ -39,7 +39,6 @@ cd docker
 mkdir mobile_moveo_docker_ws
 cd mobile_moveo_docker_ws
 docker run --name=mobile_moveo_container -it --privileged --device=/dev/video0:/dev/video0 --device=/dev/video1:/dev/video1 --device=/dev/media0:/dev/media0 --user ros --network=host --ipc=host -v $PWD/mobile_moveo_docker_ws:/home/ros -v /tmp/.X11-unix:/tmp/.X11-unix:rw --env=DISPLAY --gpus all my-ubuntu-2204-image:with-dep-yolo
-docker container start -i mobile_moveo_container
 
 - Installing OpenCV with GStreamer
 apt list --installed | grep opencv
@@ -109,6 +108,9 @@ mkdir src
 cd src
 git clone --branch main https://github.com/innovation-robotics/mobile_moveo_robot.git
 vcs import < mobile_moveo_robot/mobile_moveo.repos
+cd moveit_task_constructor
+git submodule update --init --recursive
+cd ..
 source /opt/ros/humble/setup.bash
 sudo apt install python3-rosdep
 sudo rosdep init
@@ -133,6 +135,11 @@ sudo apt update && rosdep install -r --from-paths . --ignore-src --rosdistro $RO
 cd ..
 export IGNITION_VERSION=fortress
 colcon build --event-handlers desktop_notification- status- --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+cd src
+git clone https://github.com/innovation-robotics/AprilTag-ROS-2.git
+cd ..
+colcon build --event-handlers desktop_notification- status- --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF
+sudo apt install ros-humble-twist-mux
 
 - Installing Yolo for ROS2
 git clone https://github.com/mgonzs13/yolo_ros.git
@@ -156,5 +163,63 @@ ros2 run v4l2_camera v4l2_camera_node
 ros2 launch yolo_bringup yolo.launch.py
 rviz2
 
+- Preparing Raspberry PI
+ssh ubuntu@192.168.1.245
+install ros2 humble
+git clone https://github.com/Slamtec/rplidar_ros.git
+git clone https://github.com/innovation-robotics/robot_teleop_keyboard.git
+git clone https://github.com/innovation-robotics/network_to_serial_bridge.git
+download arduino mega code for the manipulator then compile and upload to the microcontroller
+git clone https://github.com/innovation-robotics/moveo_arm_arduino_mega.git
+download arduino uno code for the base then compile and upload to the microcontroller
+git clone https://github.com/innovation-robotics/ros_arduino_bridge.git
+sudo chmod a+rw /dev/ttyUSB0
+sudo chmod a+rw /dev/ttyUSB1
+sudo chmod a+rw /dev/ttyUSB2
+sudo minicom -b 57600 -o -D /dev/ttyUSB0
+e
+1 1
+if you found this response it means it is connected to the base
+to leave the minicom
+Ctrl+a
+z
+x
+sudo minicom -b 57600 -o -D /dev/ttyUSB2
+if the lidar stopped it means it is connected to this port otherwise it is connected to the arm
+in my case i found it to be like this
+base 0
+arm 1
+lidar 2
+open repos in vscode
+review this file rplidar_a1_launch.py
+serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB0')
+make sure ttyUSB matches the com port for the lidar in this case it doesn't match so I will change it to ttyUSB2 to be like this
+serial_port = LaunchConfiguration('serial_port', default='/dev/ttyUSB2')
+in terminal 
+cd /repos/lidar_ws
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+build for the new serial port
+colcon build --symlink-install
+ros2 launch rplidar_ros rplidar_a1_launch.py
+if you want to stop the lidar in new terminal create the ssh and source and then run this command 
+ros2 service call /stop_motor std_srvs/srv/Empty
+in new terminal
+sudo gst-launch-1.0 v4l2src ! image/jpeg,width=1280,height=720,framerate=30/1 ! tcpserversink port=7001 host=0.0.0.0 sync=false async=false
+for the base open new terminal
+cd repos/rbx1_ws/build/network_to_serial_bridge/
+./network_to_serial_bridge 7777 /dev/ttyUSB0 57600
+for the arm open new terminal
+cd repos/rbx1_ws/build/network_to_serial_bridge/
+./network_to_serial_bridge 7778 /dev/ttyUSB1 115200
+
+- Running the pick and place demo
+docker container start -i mobile_moveo_container
+cd home/ros/mobile_moveo
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+ros2 launch moveit_resources_robot_moveit_config demo3.launch.py
+
 TODO
 - Please remove ros_ign
+- delete meshes folder in the /mobile_moveo_robot/robot_description 

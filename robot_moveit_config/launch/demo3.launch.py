@@ -93,23 +93,23 @@ def generate_launch_description():
                                         "publish_state_updates": True,
                                         "publish_transforms_updates": True}
 
-    # pkg_slam = get_package_share_directory('slam_toolbox')
-    # slam = IncludeLaunchDescription(
-    # PythonLaunchDescriptionSource(
-    #     os.path.join(pkg_slam, 'launch', 'online_async_launch.py')), launch_arguments={'use_sim_time': 'false', 'slam_params_file':'/home/ahmed/moveit2/ws_moveit_humble_control/src/my_robot/robot_moveit_config/config/mapper_params_online_async.yaml'}.items())    
-    # ld.add_action(slam)
+    pkg_slam = get_package_share_directory('slam_toolbox')
+    slam = IncludeLaunchDescription(
+    PythonLaunchDescriptionSource(
+        os.path.join(pkg_slam, 'launch', 'online_async_launch.py')), launch_arguments={'use_sim_time': 'false', 'slam_params_file':'/home/ros/mobile_moveo/src/mobile_moveo_robot/robot_moveit_config/config/mapper_params_online_async.yaml'}.items())    
+    ld.add_action(slam)
 
-    # # pkg_navigation = get_package_share_directory('moveit_resources_robot_moveit_config')
-    # # nav = IncludeLaunchDescription(
-    # # PythonLaunchDescriptionSource(
-    # #     os.path.join(pkg_navigation, 'launch', 'navigation_launch.py')), launch_arguments={'use_sim_time': 'false'}.items())    
-    # # ld.add_action(nav)
-
-    # pkg_navigation = get_package_share_directory('nav2_bringup')
+    # pkg_navigation = get_package_share_directory('moveit_resources_robot_moveit_config')
     # nav = IncludeLaunchDescription(
     # PythonLaunchDescriptionSource(
-    #     os.path.join(pkg_navigation, 'launch', 'navigation_launch.py')), launch_arguments={'use_sim_time': 'false', 'params_file': '/home/ahmed/moveit2/ws_moveit_humble_control/src/robot_ros2/robot_ignition/config/navigation.yaml'}.items())    
+    #     os.path.join(pkg_navigation, 'launch', 'navigation_launch.py')), launch_arguments={'use_sim_time': 'false'}.items())    
     # ld.add_action(nav)
+
+    pkg_navigation = get_package_share_directory('nav2_bringup')
+    nav = IncludeLaunchDescription(
+    PythonLaunchDescriptionSource(
+        os.path.join(pkg_navigation, 'launch', 'navigation_launch.py')), launch_arguments={'use_sim_time': 'false', 'params_file': '/home/ros/mobile_moveo/src/mobile_moveo_ros2/robot_ignition/config/navigation.yaml'}.items())    
+    ld.add_action(nav)
 
     # Start the actual move_group node/action server
     run_move_group_node = Node(package='moveit_ros_move_group',
@@ -257,16 +257,16 @@ def generate_launch_description():
     )
     ld.add_action(gst_image_capture)
 
-    # april_tag_package_name='apriltag_ros'
-    # april_tag_params = os.path.join(get_package_share_directory(april_tag_package_name),'cfg','tags_36h11.yaml')
-    # april_tag_node = Node(
-    #         package="apriltag_ros",
-    #         executable="apriltag_node",
-    #         parameters=[april_tag_params],
-    #         remappings=[('/image_rect','/image/uncompressed'),
-    #                     ('/camera_info','/camera_info')]
-    #     )
-    # ld.add_action(april_tag_node)
+    april_tag_package_name='apriltag_ros'
+    april_tag_params = os.path.join(get_package_share_directory(april_tag_package_name),'cfg','tags_36h11.yaml')
+    april_tag_node = Node(
+            package="apriltag_ros",
+            executable="apriltag_node",
+            parameters=[april_tag_params],
+            remappings=[('/image_rect','/image/uncompressed'),
+                        ('/camera_info','/camera_info')]
+        )
+    ld.add_action(april_tag_node)
 
 
     # RViz
