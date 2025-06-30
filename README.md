@@ -78,7 +78,7 @@ python3<br>
 import cv2<br>
 print(cv2.getBuildInformation())<br>
 
-Installing ROS Humble<br>
+- Installing ROS Humble<br>
 Steps:<br>
 locale  # check for UTF-8<br>
 sudo apt update && sudo apt install locales<br>
@@ -219,6 +219,6 @@ source /opt/ros/humble/setup.bash<br>
 source install/setup.bash<br>
 ros2 launch moveit_resources_robot_moveit_config demo3.launch.py<br>
 
-TODO<br>
-- Please remove ros_ign<br>
-- delete meshes folder in the /mobile_moveo_robot/robot_description <br>
+- TODO<br>
+remove ros_ign<br>
+delete meshes folder in the /mobile_moveo_robot/robot_description <br>
