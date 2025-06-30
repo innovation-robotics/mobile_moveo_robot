@@ -1,9 +1,9 @@
 # mobile_moveo_robot
-- Installing Nvidia Drivers
-Steps:
-Disable the Nouveau Open-Source Driver
-sudo apt-get purge "*nvidia*"
-sudo apt autoremove
+- Installing Nvidia Drivers<br>
+Steps:<br>
+Disable the Nouveau Open-Source Driver<br>
+sudo apt-get purge "*nvidia*"<br>
+sudo apt autoremove<br>
 sudo apt update
 Create a new blacklist file: 
 sudo nano /etc/modprobe.d/blacklist-nouveau.conf
