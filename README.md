@@ -140,27 +140,12 @@ cd ..<br>
 colcon build --event-handlers desktop_notification- status- --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF<br>
 sudo apt install ros-humble-twist-mux<br>
 
-- Installing Yolo for ROS2<br>
-git clone https://github.com/mgonzs13/yolo_ros.git<br>
-sudo apt update<br>
-sudo apt install python3-pip<br>
-pip3 install -r yolo_ros/requirements.txt<br>
-cd ~/ros2_ws<br>
-rosdep install --from-paths src --ignore-src -r -y<br>
-colcon build<br>
+- Preparing for YOLO installation<br>
 sudo usermod -a -G video ros<br>
 sudo usermod -a -G sudo ros<br>
+check<br>
 v4l2-ctl --list-devices<br>
 v4l2-ctl --list-formats-ext -d /dev/video0<br>
-gst-launch-1.0 -e -v v4l2src device=/dev/video0 ! image/jpeg,width=1280,height=720,framerate=30/1 ! jpegdec ! videoconvert ! autovideosink<br>
-docker commit -m "Installing yolo and dependencies" mobile_moveo_container my-ubuntu-2204-image:with-dep-yolo<br>
-docker exec -it mobile_moveo_container /bin/bash<br>
-source /opt/ros/humble/setup.bash<br>
-source install/setup.bash<br>
-sudo apt-get install ros-${ROS_DISTRO}-v4l2-camera<br>
-ros2 run v4l2_camera v4l2_camera_node<br>
-ros2 launch yolo_bringup yolo.launch.py<br>
-rviz2<br>
 
 - Preparing Raspberry PI<br>
 ssh ubuntu@192.168.1.245<br>
